@@ -33,6 +33,7 @@ public class HopperIterator implements IBlockIterator {
 				}
 			}
 
+			// hopper insert
 			Consumer<BlockFace> hopperSides = f -> { // for input sides
 				Service side = block.getService(f);
 				if(side instanceof InputInventoryService) {
@@ -40,10 +41,12 @@ public class HopperIterator implements IBlockIterator {
 					location.add(f.getModX(), f.getModY(), f.getModZ());
 
 					Block bhopper = location.getBlock();
-					BlockState state = bhopper.getState(); // get hopper underneath
+					BlockState state = bhopper.getState(); // get hopper on the side
 					if (state instanceof Hopper) { // check if hopper
 						Hopper hopper = (Hopper) state;
-						Inventories.mergeOne(hopper.getInventory(), ((InputInventoryService) side).inventory()); // take 1 item from output and put in inventory
+						org.bukkit.material.Hopper hopperData = (org.bukkit.material.Hopper) hopper.getData();
+						if(hopperData.getFacing() == f.getOppositeFace()) // if hopper is pointing into block
+							Inventories.mergeOne(hopper.getInventory(), ((InputInventoryService) side).inventory()); // take 1 item from output and put in inventory
 					}
 				}
 			};
