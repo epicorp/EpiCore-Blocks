@@ -7,6 +7,9 @@ import net.epicorp.persistance.database.BlockDatabase;
 import net.epicorp.persistance.database.IBlockDatabase;
 import net.epicorp.persistance.registry.IPersistenceRegistry;
 import org.bukkit.Location;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.Plugin;
 import java.util.Collections;
 import java.util.Set;
@@ -38,9 +41,11 @@ public class BlockManager implements IBlockManager {
 
 	@Override
 	public <T extends ICustomBlock & Persistent> void placeBlock(Location location, T instance) {
-		blockDatabase.setData(instance, location);
-		instance.setLocation(location);
-		instance.onPlace();
+		if(instance != null) {
+			instance.setLocation(location);
+			instance.onPlace();
+			blockDatabase.setData(instance, location);
+		}
 	}
 
 	@Override
@@ -66,5 +71,12 @@ public class BlockManager implements IBlockManager {
 	@Override
 	public void removeBlockIterator(IBlockIterator iterator) {
 		onIteration.remove(iterator);
+	}
+
+	@EventHandler (priority = EventPriority.MONITOR)
+	public void destroy(BlockBreakEvent event) {
+		ICustomBlock customBlock = removeBlock(event.getBlock().getLocation());
+		if(customBlock != null)
+			event.setDropItems(false);
 	}
 }
