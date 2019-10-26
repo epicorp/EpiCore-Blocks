@@ -25,8 +25,8 @@ public class BlockManager implements IBlockManager {
 		this.persistenceRegistry = persistenceRegistry;
 		plugin.getServer().getScheduler().runTaskTimer(plugin, () -> blockDatabase.forEach((l, p) -> {
 			if(p instanceof ICustomBlock) {
-				((ICustomBlock) p).update();
 				onIteration.forEach(c -> c.consume((ICustomBlock) p));
+				((ICustomBlock) p).update();
 			}
 		}), 0, 8);
 	}

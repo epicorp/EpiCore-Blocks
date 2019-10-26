@@ -3,15 +3,18 @@ package net.epicorp.blocks.manager.iterators;
 import net.epicorp.blocks.ICustomBlock;
 import net.epicorp.blocks.containers.FunctionalBlock;
 import net.epicorp.blocks.containers.services.Service;
+import net.epicorp.blocks.containers.services.inventories.FilteredInventoryService;
 import net.epicorp.blocks.containers.services.inventories.InputInventoryService;
 import net.epicorp.blocks.containers.services.inventories.OutputInventoryService;
-import net.epicorp.utilities.inventories.Inventories;
 import net.epicorp.blocks.manager.IBlockIterator;
+import net.epicorp.utilities.inventories.Inventories;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Hopper;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import java.util.function.Consumer;
 
 public class HopperIterator implements IBlockIterator {
@@ -45,8 +48,12 @@ public class HopperIterator implements IBlockIterator {
 					if (state instanceof Hopper) { // check if hopper
 						Hopper hopper = (Hopper) state;
 						org.bukkit.material.Hopper hopperData = (org.bukkit.material.Hopper) hopper.getData();
-						if(hopperData.getFacing() == f.getOppositeFace()) // if hopper is pointing into block
-							Inventories.mergeOne(hopper.getInventory(), ((InputInventoryService) side).inventory()); // take 1 item from output and put in inventory
+						if(hopperData.getFacing() == f.getOppositeFace()) {// if hopper is pointing into block
+							Inventory inventory = hopper.getInventory();
+							ItemStack stack = Inventories.getFirst(inventory);
+							if(!(side instanceof FilteredInventoryService) || ((FilteredInventoryService) side).valid(stack)) // if filtered, then check filter
+								Inventories.mergeOne(hopper.getInventory(), ((InputInventoryService) side).inventory()); // take 1 item from output and put in inventory
+						}
 					}
 				}
 			};
