@@ -42,7 +42,7 @@ public interface IBlockManager extends Listener {
 	 * @return the old instance of the block
 	 */
 	default ICustomBlock removeBlock(Location location) {
-		ICustomBlock customBlock = deleteBlock(location);
+		ICustomBlock customBlock = this.deleteBlock(location);
 		if (customBlock != null) customBlock.onDestroy();
 		return customBlock;
 	}
@@ -63,8 +63,8 @@ public interface IBlockManager extends Listener {
 	 * @return the newly placed block
 	 */
 	default <T extends ICustomBlock & Persistent> T placeBlock(Location location, Class<T> _class) {
-		T customBlock = getRegistry().newInstance(_class);
-		placeBlock(location, customBlock);
+		T customBlock = this.getRegistry().newInstance(_class);
+		this.placeBlock(location, customBlock);
 		return customBlock;
 	}
 
@@ -75,8 +75,8 @@ public interface IBlockManager extends Listener {
 	 * @return the newly placed block
 	 */
 	default <T extends ICustomBlock & Persistent> T placeBlock(Location location, int id) {
-		T customBlock = (T) getRegistry().newInstance(id);
-		placeBlock(location, customBlock);
+		T customBlock = (T) this.getRegistry().newInstance(id);
+		this.placeBlock(location, customBlock);
 		return customBlock;
 	}
 

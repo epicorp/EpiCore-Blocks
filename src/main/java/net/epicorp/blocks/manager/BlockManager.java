@@ -20,12 +20,12 @@ public class BlockManager implements IBlockManager {
 	protected final Set<IBlockIterator> onIteration;
 
 	public BlockManager(IBlockDatabase blockDatabase, IPersistenceRegistry persistenceRegistry, Plugin plugin, Set<IBlockIterator> blockIterators) {
-		onIteration = blockIterators;
+		this.onIteration = blockIterators;
 		this.blockDatabase = blockDatabase;
 		this.persistenceRegistry = persistenceRegistry;
 		plugin.getServer().getScheduler().runTaskTimer(plugin, () -> blockDatabase.forEach((l, p) -> {
 			if(p instanceof ICustomBlock) {
-				onIteration.forEach(c -> c.consume((ICustomBlock) p));
+				this.onIteration.forEach(c -> c.consume((ICustomBlock) p));
 				((ICustomBlock) p).update();
 			}
 		}), 0, 8);
@@ -44,38 +44,38 @@ public class BlockManager implements IBlockManager {
 		if(instance != null) {
 			instance.setLocation(location);
 			instance.onPlace();
-			blockDatabase.setData(instance, location);
+			this.blockDatabase.setData(instance, location);
 		}
 	}
 
 	@Override
 	public IPersistenceRegistry getRegistry() {
-		return persistenceRegistry;
+		return this.persistenceRegistry;
 	}
 
 	@Override
 	public ICustomBlock getBlock(Location location) {
-		return blockDatabase.getData(location);
+		return this.blockDatabase.getData(location);
 	}
 
 	@Override
 	public ICustomBlock deleteBlock(Location location) {
-		return blockDatabase.removeData(location);
+		return this.blockDatabase.removeData(location);
 	}
 
 	@Override
 	public void registerBlockIterator(IBlockIterator iterator) {
-		onIteration.add(iterator);
+		this.onIteration.add(iterator);
 	}
 
 	@Override
 	public void removeBlockIterator(IBlockIterator iterator) {
-		onIteration.remove(iterator);
+		this.onIteration.remove(iterator);
 	}
 
 	@EventHandler (priority = EventPriority.MONITOR)
 	public void destroy(BlockBreakEvent event) {
-		ICustomBlock customBlock = removeBlock(event.getBlock().getLocation());
+		ICustomBlock customBlock = this.removeBlock(event.getBlock().getLocation());
 		if(customBlock != null)
 			event.setDropItems(false);
 	}

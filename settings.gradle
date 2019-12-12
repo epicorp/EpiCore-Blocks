@@ -1,2 +1,4 @@
-rootProject.name = 'EpiCore-Blocks'
+rootProject.name = 'EpiCore-1.14'
+include ':EpiCore-Persistance'
+include ':EpiCore-Utilities'
 

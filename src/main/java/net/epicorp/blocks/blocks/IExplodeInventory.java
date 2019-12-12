@@ -16,9 +16,9 @@ import java.util.Objects;
 public interface IExplodeInventory extends ICustomBlock {
 	@Listening(event = CustomBlockEvent.ON_DESTROY)
 	default void destroy() {
-		Location location = getLocation().add(.5, .5, .5);
+		Location location = this.getLocation().add(.5, .5, .5);
 		World world = location.getWorld();
-		inventories().stream().map(Inventory::getContents).flatMap(Arrays::stream).filter(Objects::nonNull).forEach(i -> world.dropItemNaturally(location, i));
+		this.inventories().stream().map(Inventory::getContents).flatMap(Arrays::stream).filter(Objects::nonNull).forEach(i -> world.dropItemNaturally(location, i));
 	}
 
 	List<Inventory> inventories();

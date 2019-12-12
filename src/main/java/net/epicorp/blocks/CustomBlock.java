@@ -17,14 +17,14 @@ public abstract class CustomBlock implements Persistent, ICustomBlock {
 	private static Map<Class<?>, Map<CustomBlockEvent, List<Consumer<CustomBlock>>>> methods = new HashMap<>();
 
 	public CustomBlock() {
-		if(!methods.containsKey(getClass())) {
-			Class<?> _class = getClass();
+		if(!methods.containsKey(this.getClass())) {
+			Class<?> _class = this.getClass();
 			Method[] methods = _class.getMethods();
-			this.methods.put(getClass(), new HashMap<>());
+			CustomBlock.methods.put(this.getClass(), new HashMap<>());
 			for (Method method : methods) {
 				Listening listening = method.getAnnotation(Listening.class);
 				if (listening != null) {
-					this.methods.get(getClass()).computeIfAbsent(listening.event(), (k) -> new ArrayList<>()).add(c -> {
+					CustomBlock.methods.get(this.getClass()).computeIfAbsent(listening.event(), (k) -> new ArrayList<>()).add(c -> {
 						try {
 							method.invoke(c);
 						} catch (ReflectiveOperationException e) {
@@ -37,37 +37,42 @@ public abstract class CustomBlock implements Persistent, ICustomBlock {
 	}
 
 
+	@Override
 	public final void update() {
-		exec(CustomBlockEvent.ON_UPDATE);
+		this.exec(CustomBlockEvent.ON_UPDATE);
 	}
 
+	@Override
 	public final void onDestroy() {
-		exec(CustomBlockEvent.ON_DESTROY);
+		this.exec(CustomBlockEvent.ON_DESTROY);
 	}
 
+	@Override
 	public final void onPlace() {
-		exec(CustomBlockEvent.ON_PLACE);
+		this.exec(CustomBlockEvent.ON_PLACE);
 	}
 
 	private void exec(CustomBlockEvent event) {
-		List<Consumer<CustomBlock>> consumers = methods.get(getClass()).get(event);
+		List<Consumer<CustomBlock>> consumers = methods.get(this.getClass()).get(event);
 		if(consumers != null)
 			consumers.forEach(c -> c.accept(this));
 	}
 
+	@Override
 	public Location getLocation() {
-		return location.clone(); // trust me, this is for the best
+		return this.location.clone(); // trust me, this is for the best
 	}
+	@Override
 	public void setLocation(Location location) {
 		this.location = location;
 	}
 
 	public void deserLocation(DataInputStream dis) throws IOException {
-		setLocation(new Location(Bukkit.getWorld(new UUID(dis.readLong(), dis.readLong())), dis.readInt(), dis.readInt(), dis.readInt()));
+		this.setLocation(new Location(Bukkit.getWorld(new UUID(dis.readLong(), dis.readLong())), dis.readInt(), dis.readInt(), dis.readInt()));
 	}
 
 	public void serLocation(DataOutputStream dos) throws IOException {
-		Location location = getLocation();
+		Location location = this.getLocation();
 		UUID uuid = location.getWorld().getUID();
 		dos.writeLong(uuid.getMostSignificantBits());
 		dos.writeLong(uuid.getLeastSignificantBits());
